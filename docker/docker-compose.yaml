@@ -1,0 +1,14 @@
+version: '3.5'
+
+services:
+  service:
+    image: ${DOCKER_IMAGE}
+    restart: on-failure:3
+    depends_on:
+      - kafka
+      - zookeeper
+      - postgres
+    ports:
+      - "8080:8080"
+    environment:
+      JAVA_OPTS: -Dconfig.resource=docker.conf -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005

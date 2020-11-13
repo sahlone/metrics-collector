@@ -1,0 +1,215 @@
+import java.time.Duration
+
+buildscript {
+    repositories {
+        jcenter()
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    apply from: 'gradle/dependencies.gradle'
+    dependencies {
+        classpath "$libraries.kotlinPlugin"
+        classpath "$libraries.dockerComposePlugin"
+        classpath "$libraries.detekt"
+        classpath "$libraries.shadowPlugin"
+        classpath "$libraries.dockerPlugin"
+        classpath "$libraries.gitVersioningPlugin"
+        classpath "$libraries.ktlint"
+    }
+
+}
+
+repositories {
+    jcenter()
+    mavenLocal()
+    mavenCentral()
+    maven { url "https://jitpack.io" }
+}
+
+
+Map<String, String> libraries = rootProject.ext.libraries
+
+
+apply plugin: "org.jetbrains.kotlin.jvm"
+apply plugin: 'application'
+apply plugin: 'idea'
+apply plugin: "io.gitlab.arturbosch.detekt"
+apply plugin: "com.github.johnrengelman.shadow"
+apply plugin: "com.palantir.git-version"
+apply plugin: "org.jlleitschuh.gradle.ktlint"
+dependencies {
+
+    // Use the Kotlin JDK 8 standard library
+    implementation libraries.kotlinStdlib
+    implementation libraries.kotlinReflect
+
+    // own
+    implementation libraries.kson
+    implementation libraries.klogging
+
+    // arrow
+    implementation libraries.arrowCore
+    implementation libraries.arrowData
+    implementation libraries.arrowEffects
+    implementation libraries.arrowEffectsMtl
+
+    implementation libraries.arrowEffectsInstances
+    implementation libraries.arrowInstancesCore
+    implementation libraries.arrowInstancesData
+    implementation libraries.arrowSyntax
+    implementation libraries.arrowTypeclasses
+
+
+    // http4k
+    implementation libraries.http4k
+    implementation libraries.http4kJackson
+    implementation libraries.http4kContract
+    implementation libraries.http4kNetty
+    implementation libraries.http4kOkHttp
+
+
+    // json
+    implementation libraries.jacksonJsr310
+
+
+    //logging
+    implementation libraries.sl4j
+    implementation libraries.logstashLogbackEncoder
+    implementation libraries.logbackClassic
+
+    //jdbc
+    implementation libraries.exposed
+    implementation libraries.flyway
+    implementation libraries.postgres
+    implementation libraries.hikari
+
+    //config
+    implementation libraries.config4k
+    implementation libraries.koin
+    implementation libraries.koinTest
+
+
+    implementation libraries.kafka
+
+
+    // Use the Kotlin Junit runner which integrates the kotlin test library as well
+    testImplementation libraries.kotlinTest
+    testImplementation libraries.restAssured
+    testImplementation libraries.restAssuredKotlin
+    //extras
+    detektPlugins libraries.detektKtLintFormat
+}
+
+configurations.all {
+    exclude module: 'slf4j-log4j12'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+    kotlinOptions {
+        // freeCompilerArgs += ["-XXLanguage:+InlineClasses"]
+        allWarningsAsErrors = true
+        jvmTarget = "1.8"
+    }
+}
+
+sourceSets {
+    functionalTest {
+        kotlin {
+            compileClasspath += sourceSets.main.output
+            runtimeClasspath += sourceSets.main.output
+            srcDirs = ['src/functional-tests/kotlin']
+        }
+        resources.srcDirs = ['src/functional-tests/resources', 'src/test/resources']
+    }
+    // this needs to notify of no java files, otherwise gradle prints a warning in info mode
+    main.java.srcDirs = []
+    test.java.srcDirs = []
+}
+
+configurations {
+    functionalTestImplementation.extendsFrom testImplementation
+    functionalTestRuntime.extendsFrom testRuntime
+}
+
+detekt {
+    failFast = true
+    parallel = true
+    config = files("$rootProject.projectDir/detekt-config.yml")
+    input = files("src/main/kotlin")
+
+    reports {
+        html.enabled = false // observe findings in your browser with structure and code snippets
+        xml.enabled = false // checkstyle like format mainly for integrations like Jenkins
+    }
+}
+
+def baseDockerFile = file("${rootProject.projectDir}/docker/Dockerfile")
+def rootDockerDir = file("${rootProject.projectDir}/docker")
+apply plugin: "com.palantir.docker"
+apply plugin: 'docker-compose'
+def gitDetails = versionDetails()
+def currentWeek = new Date().format("yyyy'W'ww")
+String jarName = shadowJar.archiveName
+String tag = "$currentWeek-${gitDetails.gitHash}"
+String taggedDockerImageName = "${project.name}:$tag"
+
+task functionalTest(type: Test) {
+    description = 'Runs functional tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.functionalTest.output.classesDirs
+    classpath = sourceSets.functionalTest.runtimeClasspath
+    mustRunAfter test
+}
+functionalTest {
+    useJUnitPlatform()
+}
+
+docker {
+    name = taggedDockerImageName
+    buildArgs([JAR_NAME: jarName])
+    dockerfile baseDockerFile
+    files shadowJar.outputs.files, "${rootProject.projectDir}/docker/start-app.sh", "${rootProject.buildDir}/apm/dd-java-agent.jar"
+}
+
+task dockerPushTag(type: Exec) {
+    def registry = project.hasProperty('registry') ? project.property('registry') : 'docker.io'
+    def remote = "$registry/upi-${project.name}:$tag"
+    commandLine 'sh', '-c', "docker tag $taggedDockerImageName $remote && docker push $remote"
+}
+task getVersion() {
+    println(tag)
+}
+
+dockerCompose {
+    environment["DOCKER_IMAGE"] = taggedDockerImageName
+    environment["SERVICE_NAME"] = projectName
+    useComposeFiles = ['docker-compose-env.yaml','docker-compose.yaml']
+    captureContainersOutput = true
+    waitForTcpPorts = true
+    dockerComposeWorkingDirectory = "$rootDockerDir"
+    projectName = "stellar"
+    stopContainers = true
+    removeContainers = true
+    removeVolumes = true
+    removeOrphans = false
+    waitForHealthyStateTimeout = Duration.ofMinutes(1)
+}
+
+compileKotlin.dependsOn "detekt"
+check.dependsOn "detekt"
+check.dependsOn functionalTest
+tasks.docker.dependsOn assemble
+tasks.docker.dependsOn dockerPrepare
+functionalTest.dependsOn(tasks.composeUp)
+composeUp.dependsOn tasks.docker
+dockerPushTag.dependsOn(tasks.docker)
+dockerCompose.isRequiredBy(functionalTest)
+
+mainClassName = 'com.sahlone.mc.MainKt'

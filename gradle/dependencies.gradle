@@ -1,0 +1,100 @@
+ext {
+    kson = '1.0.3'
+    klogging = '1.0.1'
+    kotlinVersion = '1.3.20'
+    kotlinTest = '3.4.2'
+    detekt = '1.0.0-RC14'
+    shadow = '5.0.0'
+    dockerImagePlugin = '0.21.0'
+    gitVersioning = '0.11.0'
+    arrow = '0.8.2'
+    arrowTypeclasses = '0.9.0'
+    http4k = '3.127.0'
+    okHttpInterceptor = "3.14.4"
+    jackson = '2.10.3'
+    sl4j = '1.7.25'
+    logstashLogbackEncoder = '5.0'
+    logback = '1.2.2'
+    dockerComposePlugin = '0.8.4'
+    exposed = '0.13.2'
+    flyway = '5.2.4'
+    postgres = '42.2.0'
+    hikari = '2.7.6'
+    config4k = '0.4.1'
+    koin = '2.0.0-rc-2'
+    restAssured = '4.2.0'
+    kafka = '2.2.1'
+
+    libraries = [
+            // kson
+            'kson'                  : "com.github.sahlone:kson:$kson",
+            'klogging'              : "com.github.sahlone:klogging:$klogging",
+            //core
+            'kotlinPlugin'          : "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion",
+            'detekt'                : "io.gitlab.arturbosch.detekt:detekt-gradle-plugin:$detekt",
+            'detektKtLintFormat'    : "io.gitlab.arturbosch.detekt:detekt-formatting:$detekt",
+            'dockerComposePlugin'   : "com.avast.gradle:gradle-docker-compose-plugin:$dockerComposePlugin",
+            'kotlinStdlib'          : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion",
+            'kotlinReflect'         : "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion",
+            'kotlinTest'            : "io.kotlintest:kotlintest-runner-junit5:$kotlinTest",
+            'kotlinTestJsonAsserts' : "io.kotlintest:kotlintest-assertions-json:$kotlinTest",
+            'ktlint'                : "org.jlleitschuh.gradle:ktlint-gradle:9.1.1",
+
+            //arrow
+            'arrowCore'             : "io.arrow-kt:arrow-core:$arrow",
+            'arrowData'             : "io.arrow-kt:arrow-data:$arrow",
+            'arrowEffects'          : "io.arrow-kt:arrow-effects:${arrow}",
+            'arrowEffectsMtl'       : "io.arrow-kt:arrow-mtl:${arrow}",
+            'arrowEffectsInstances' : "io.arrow-kt:arrow-effects-instances:${arrow}",
+            'arrowInstancesCore'    : "io.arrow-kt:arrow-instances-core:${arrow}",
+            'arrowInstancesData'    : "io.arrow-kt:arrow-instances-data:${arrow}",
+            'arrowSyntax'           : "io.arrow-kt:arrow-syntax:${arrow}",
+            'arrowTypeclasses'      : "io.arrow-kt:arrow-typeclasses:${arrowTypeclasses}",
+
+            // Http4k
+            'http4k'                : "org.http4k:http4k-core:$http4k",
+            'http4kJackson'         : "org.http4k:http4k-format-jackson:$http4k",
+            'http4kContract'        : "org.http4k:http4k-contract:$http4k",
+            'http4kNetty'           : "org.http4k:http4k-server-netty:$http4k",
+            'http4kOkHttp'          : "org.http4k:http4k-client-okhttp:$http4k",
+            'okHttpInterceptor'     : "com.squareup.okhttp3:logging-interceptor:$okHttpInterceptor",
+
+
+            // json
+            'jacksonCore'           : "com.fasterxml.jackson.core:jackson-core:$jackson",
+            'jacksonDatabind'       : "com.fasterxml.jackson.core:jackson-databind:$jackson",
+            'jacksonKotlin'         : "com.fasterxml.jackson.module:jackson-module-kotlin:$jackson",
+            'jacksonJsr310'         : "com.fasterxml.jackson.datatype:jackson-datatype-jsr310:$jackson",
+
+            //logging
+            'sl4j'                  : "org.slf4j:slf4j-api:$sl4j",
+            'logstashLogbackEncoder': "net.logstash.logback:logstash-logback-encoder:$logstashLogbackEncoder",
+            'logbackClassic'        : "ch.qos.logback:logback-classic:$logback",
+
+            //shadow plugin
+            "shadowPlugin"          : "com.github.jengelman.gradle.plugins:shadow:$shadow",
+
+            //docker image
+            "dockerPlugin"          : "gradle.plugin.com.palantir.gradle.docker:gradle-docker:$dockerImagePlugin",
+            "gitVersioningPlugin"   : "gradle.plugin.com.palantir.gradle.gitversion:gradle-git-version:$gitVersioning",
+
+            //jdbc
+            "exposed"               : "org.jetbrains.exposed:exposed:$exposed",
+
+            //db
+            'flyway'                : "org.flywaydb:flyway-core:$flyway",
+            'postgres'              : "org.postgresql:postgresql:$postgres",
+            'hikari'                : "com.zaxxer:HikariCP:$hikari",
+
+            //config
+            'config4k'              : "io.github.config4k:config4k:$config4k",
+            'koin'                  : "org.koin:koin-core:$koin",
+            'koinTest'              : "org.koin:koin-test:$koin",
+
+            'restAssured'           : "io.rest-assured:rest-assured:$restAssured",
+            'restAssuredKotlin'     : "io.rest-assured:kotlin-extensions:$restAssured",
+
+            'kafka'                 : "org.apache.kafka:kafka_2.12:$kafka",
+
+    ]
+}
