@@ -1,4 +1,4 @@
-Sensor metrics Collector
+### IOT application for collecting sensor metrics
 The application is a demo of a kotlin project for a IOT application where the metrics can be collected from sensors
 
 ### Architecture
