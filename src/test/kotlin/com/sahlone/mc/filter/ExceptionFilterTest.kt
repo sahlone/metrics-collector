@@ -24,7 +24,7 @@ class ExceptionFilterTest : ShouldSpec({
 
     should("give correct status code for HttpException") {
         val exceptionResponseProvider: (Request) -> Response = {
-            throw HttpException(Status.BAD_GATEWAY,"some error message")
+            throw HttpException(Status.BAD_GATEWAY, "some error message")
         }
         val requestHandler =
             filter(exceptionResponseProvider)

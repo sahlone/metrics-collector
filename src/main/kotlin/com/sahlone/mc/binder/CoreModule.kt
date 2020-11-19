@@ -1,10 +1,10 @@
 package com.sahlone.mc.binder
 
 import com.sahlone.mc.events.KafkaConsumer
-import com.sahlone.mc.repository.Repository
-import com.sahlone.mc.service.SensorAlertService
 import com.sahlone.mc.events.SensorDataConsumer
 import com.sahlone.mc.events.SensorDataPublisher
+import com.sahlone.mc.repository.Repository
+import com.sahlone.mc.service.SensorAlertService
 import com.sahlone.mc.service.SensorDataService
 import com.sahlone.mc.service.SensorMetricsService
 import com.sahlone.mc.service.SensorStatusService
@@ -30,12 +30,6 @@ object CoreModule {
             }
             single {
                 SensorStatusService(get())
-            }
-            single {
-                SensorMetricsService(get())
-            }
-            single {
-                SensorAlertService(get())
             }
             single {
                 val sensorDataConsumer = SensorDataConsumer(get(), get(), get(), get())

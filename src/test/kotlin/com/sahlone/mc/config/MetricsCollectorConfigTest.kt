@@ -1,12 +1,10 @@
 package com.sahlone.mc.config
 
-import arrow.core.Try
 import arrow.core.getOrElse
 import com.github.sahlone.klogging.TracingContext
 import io.kotlintest.fail
 import io.kotlintest.shouldBe
 import io.kotlintest.specs.ShouldSpec
-import java.lang.reflect.InvocationTargetException
 
 class MetricsCollectorConfigTest : ShouldSpec({
 

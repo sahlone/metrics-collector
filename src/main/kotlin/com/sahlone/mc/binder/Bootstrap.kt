@@ -5,9 +5,9 @@ import arrow.core.recoverWith
 import arrow.data.NonEmptyList
 import com.github.sahlone.klogging.TracingContext
 import com.github.sahlone.klogging.createContextualLogger
-import com.sahlone.mc.modules.HealthCheckModule
 import com.sahlone.mc.modules.DatabaseModule
 import com.sahlone.mc.modules.DbMigrations
+import com.sahlone.mc.modules.HealthCheckModule
 import kotlin.system.exitProcess
 import org.http4k.routing.RoutingHttpHandler
 import org.http4k.server.Netty

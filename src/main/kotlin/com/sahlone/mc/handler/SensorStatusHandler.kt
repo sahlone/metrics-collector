@@ -4,9 +4,9 @@ import arrow.core.Either
 import arrow.core.flatMap
 import com.github.sahlone.klogging.TracingContext
 import com.sahlone.kson.data.mapper.Json
-import com.sahlone.mc.models.Error.Companion.NotFound
 import com.sahlone.mc.handler.SensorStatusHandler.Companion.SensorStatusResponse
 import com.sahlone.mc.models.Error
+import com.sahlone.mc.models.Error.Companion.NotFound
 import com.sahlone.mc.repository.Repository
 import com.sahlone.mc.utils.uuidPath
 import org.http4k.core.Request
